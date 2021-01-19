@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"/>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.5.1.min.js"></script>
+    <title>Quiz App</title>
+</head>
+<style>
+    .display {
+        display: none;
+    }
+</style>
+<body>
+
+
+<div class="container">
+    <h1 class="text-center">Online Quiz</h1>
+    <hr>
+    <form action="" method="post">
+        {% csrf_token %}
+        {% for question in questions %}
+            <div name="{{ question.id }}">
+                <h4>{{ question.id }} ) {{ question.question }} </h4>
+                <input type="radio" name="{{ question.id }}" value="{{ question.choice1 }}"> {{ question.choice1 }}<br>
+                <input type="radio" name="{{ question.id }}" value="{{ question.choice2 }}"> {{ question.choice2 }}<br>
+                <input type="radio" name="{{ question.id }}" value="{{ question.choice3 }}"> {{ question.choice3 }}<br>
+                <input type="radio" name="{{ question.id }}" value="{{ question.choice4 }}"> {{ question.choice4 }}<br>
+                <b class="display">answer : <span class="text-success">{{ question.answer }}</span></b>
+                <hr>
+            </div>
+        {% endfor %}
+        <span id="answer" class="display text-info"></span><br><br>
+        <button type="submit" class="btn btn-success"> Result</button>
+    </form>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $('form').submit(function (e) {
+            e.preventDefault()
+            $("[type=radio]").attr("disabled", true)
+            $('.display').show()
+            let question = $(this).find('div')
+            let count_true = 0
+            let count_false = 0
+            for (let i = 0; i < question.length; i++) {
+                let answer = question[i].querySelector('span.text-success').innerHTML
+                if (question[i].querySelector('input:checked')) {
+                    if (answer === question[i].querySelector('input:checked').value) {
+                        $("#answer").append(`<p>Q ${i + 1} ) ${question[i].querySelector('input:checked').value} <b class='text-success'>True</b> </p>`);
+                        count_true += 1
+                    } else {
+                        $("#answer").append(`<p>Q ${i + 1} ) ${question[i].querySelector('input:checked').value} <b class='text-danger'>False</b> </p>`);
+                        count_false += 1
+                    }
+                } else {
+                    $("#answer").append(`<p>Q ${i + 1} ) ... <b class='text-danger'>False</b></p>`)
+                    count_false += 1
+                }
+            }
+            $("#answer").append(`<p>you have <b>${count_true}</b> Right and <b>${count_false}</b> False</p>`)
+            $('.btn-success').attr('disabled', true)
+        })
+    })
+</script>
+
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+
+</body>
+</html>
